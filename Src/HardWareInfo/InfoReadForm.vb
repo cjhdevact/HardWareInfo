@@ -396,25 +396,33 @@ Public Class InfoReadForm
                 displayKey.Close()
             End If
 
-            ' 备用：从 PCI 枚举显卡（用于离线场景）
+            ' 备用：从 PCI 枚举显卡
             Dim pciKey As RegistryKey = RegistryRoot.OpenSubKey("SYSTEM\CurrentControlSet\Enum\PCI")
             If pciKey IsNot Nothing Then
                 For Each ven In pciKey.GetSubKeyNames()
                     If cancelDetection Then Exit Sub
 
-                    For Each dev In pciKey.GetSubKeyNames(ven)
+                    Dim venKey As RegistryKey = pciKey.OpenSubKey(ven)
+                    If venKey Is Nothing Then Continue For
+
+                    For Each dev In venKey.GetSubKeyNames()
                         If cancelDetection Then Exit Sub
 
-                        Dim devKey As RegistryKey = pciKey.OpenSubKey(ven & "\" & dev)
-                        Dim classGuid As String = GetRegValue(devKey, "Class", "")
-                        If classGuid = "Display" OrElse classGuid = "{4d36e968-e325-11ce-bfc1-08002be10318}" Then
+                        Dim devKey As RegistryKey = venKey.OpenSubKey(dev)
+                        If devKey Is Nothing Then Continue For
+
+                        Dim className As String = GetRegValue(devKey, "Class", "")
+                        Dim classGuid As String = GetRegValue(devKey, "ClassGUID", "")
+
+                        If className = "Display" OrElse classGuid = "{4d36e968-e325-11ce-bfc1-08002be10318}" Then
                             Dim desc As String = GetRegValue(devKey, "DeviceDesc", "")
-                            If desc <> "" Then
+                            If desc <> "" AndAlso Not desc.Contains("@oem") Then
                                 AppendToTextBox("  [PCI] " & desc)
                             End If
                         End If
                         devKey.Close()
                     Next
+                    venKey.Close()
                 Next
                 pciKey.Close()
             End If
@@ -495,61 +503,62 @@ Public Class InfoReadForm
         Try
             Dim hwConfigPath As String = "SYSTEM\HardwareConfig"
             Dim hwConfigKey As RegistryKey = RegistryRoot.OpenSubKey(hwConfigPath)
-
-            If hwConfigKey IsNot Nothing Then
-                Dim biosIds As String() = hwConfigKey.GetSubKeyNames()
-                Dim index As Integer = 1
-
-                For Each biosId As String In biosIds
-                    If cancelDetection Then Exit Sub
-
-                    ' 跳过名为 "Current" 的子项
-                    If String.Equals(biosId, "Current", StringComparison.OrdinalIgnoreCase) Then
-                        Continue For
-                    End If
-
-                    Dim subPath As String = hwConfigPath & "\" & biosId
-                    Dim biosKey As RegistryKey = RegistryRoot.OpenSubKey(subPath)
-                    If biosKey Is Nothing Then
-                        Continue For
-                    End If
-
-                    ' 判断是否为最近使用（根据 LastUse 字段是否存在）
-                    Dim lastUseValue As Object = biosKey.GetValue("LastUse", Nothing)
-                    Dim isLastUsed As Boolean = (lastUseValue IsNot Nothing)
-
-                    ' 输出编号 + BIOSID
-                    Dim header As String = "  [" & index.ToString() & "] " & biosId
-                    If isLastUsed Then
-                        header &= " <- 最近使用"
-                    End If
-                    AppendToTextBox(header)
-
-                    ' 从注册表读取正确的字段
-                    Dim systemManufacturer As String = GetRegValue(biosKey, "SystemManufacturer", "未知")
-                    Dim systemProductName As String = GetRegValue(biosKey, "SystemProductName", "未知")
-                    Dim systemProductSku As String = GetRegValue(biosKey, "SystemSKU", "未知")
-                    Dim baseBoardManufacturer As String = GetRegValue(biosKey, "BaseBoardManufacturer", "未知")
-                    Dim baseBoardProduct As String = GetRegValue(biosKey, "BaseBoardProduct", "未知")
-                    Dim biosVendor As String = GetRegValue(biosKey, "BIOSVendor", "未知")
-                    Dim biosVersion As String = GetRegValue(biosKey, "BIOSVersion", "未知")
-                    Dim biosReleaseDate As String = GetRegValue(biosKey, "BIOSReleaseDate", "未知")
-
-                    ' 按格式输出
-                    AppendToTextBox("      整机厂商      : " & systemManufacturer)
-                    AppendToTextBox("      整机型号      : " & systemProductName)
-                    AppendToTextBox("      整机SKU       : " & systemProductSku)
-                    AppendToTextBox("      主板厂商      : " & baseBoardManufacturer)
-                    AppendToTextBox("      主板型号      : " & baseBoardProduct)
-                    AppendToTextBox("      BIOS 厂商     : " & biosVendor)
-                    AppendToTextBox("      BIOS 版本     : " & biosVersion)
-                    AppendToTextBox("      BIOS 日期     : " & biosReleaseDate)
-
-                    biosKey.Close()
-                    index = index + 1
-                Next
-                hwConfigKey.Close()
+            If hwConfigKey Is Nothing Then
+                AppendToTextBox("  未读取到硬件配置信息")
+                Exit Sub
             End If
+
+            ' 读取 LastConfig 获得最近一次使用的 GUID
+            Dim lastConfigGuid As String = GetRegValue(hwConfigKey, "LastConfig", "").Trim()
+
+            Dim biosIds As String() = hwConfigKey.GetSubKeyNames()
+            Dim index As Integer = 1
+
+            For Each biosId As String In biosIds
+                If cancelDetection Then Exit Sub
+
+                ' 只跳过 Current，其他全部保留
+                If String.Equals(biosId, "Current", StringComparison.OrdinalIgnoreCase) Then
+                    Continue For
+                End If
+
+                Dim subPath As String = hwConfigPath & "\" & biosId
+                Dim biosKey As RegistryKey = RegistryRoot.OpenSubKey(subPath)
+                If biosKey Is Nothing Then Continue For
+
+                ' 只有匹配 LastConfig 的才标记最近使用
+                Dim isLastUsed As Boolean = biosId.Equals(lastConfigGuid, StringComparison.OrdinalIgnoreCase)
+
+                ' 输出
+                Dim header As String = "  [" & index.ToString() & "] " & biosId
+                If isLastUsed Then
+                    header &= " <- 最近使用"
+                End If
+                AppendToTextBox(header)
+
+                Dim systemManufacturer As String = GetRegValue(biosKey, "SystemManufacturer", "未知")
+                Dim systemProductName As String = GetRegValue(biosKey, "SystemProductName", "未知")
+                Dim systemProductSku As String = GetRegValue(biosKey, "SystemSKU", "未知")
+                Dim baseBoardManufacturer As String = GetRegValue(biosKey, "BaseBoardManufacturer", "未知")
+                Dim baseBoardProduct As String = GetRegValue(biosKey, "BaseBoardProduct", "未知")
+                Dim biosVendor As String = GetRegValue(biosKey, "BIOSVendor", "未知")
+                Dim biosVersion As String = GetRegValue(biosKey, "BIOSVersion", "未知")
+                Dim biosReleaseDate As String = GetRegValue(biosKey, "BIOSReleaseDate", "未知")
+
+                AppendToTextBox("      整机厂商      : " & systemManufacturer)
+                AppendToTextBox("      整机型号      : " & systemProductName)
+                AppendToTextBox("      整机SKU       : " & systemProductSku)
+                AppendToTextBox("      主板厂商      : " & baseBoardManufacturer)
+                AppendToTextBox("      主板型号      : " & baseBoardProduct)
+                AppendToTextBox("      BIOS 厂商     : " & biosVendor)
+                AppendToTextBox("      BIOS 版本     : " & biosVersion)
+                AppendToTextBox("      BIOS 日期     : " & biosReleaseDate)
+                AppendToTextBox("")
+
+                biosKey.Close()
+                index = index + 1
+            Next
+            hwConfigKey.Close()
         Catch ex As Exception
             AppendToTextBox("  读取失败：" & ex.Message)
         End Try
@@ -621,10 +630,15 @@ Public Class InfoReadForm
                 For Each ven In pnpKey.GetSubKeyNames()
                     If cancelDetection Then Exit Sub
 
-                    For Each dev In pnpKey.GetSubKeyNames(ven)
+                    Dim venKey As RegistryKey = pnpKey.OpenSubKey(ven)
+                    If venKey Is Nothing Then Continue For
+
+                    For Each dev In venKey.GetSubKeyNames()
                         If cancelDetection Then Exit Sub
 
-                        Dim devKey As RegistryKey = pnpKey.OpenSubKey(ven & "\" & dev)
+                        Dim devKey As RegistryKey = venKey.OpenSubKey(dev)
+                        If devKey Is Nothing Then Continue For
+
                         Dim className As String = GetRegValue(devKey, "Class", "")
                         If className = "Net" Then
                             Dim desc As String = GetRegValue(devKey, "DeviceDesc", "")
@@ -634,6 +648,7 @@ Public Class InfoReadForm
                         End If
                         devKey.Close()
                     Next
+                    venKey.Close()
                 Next
                 pnpKey.Close()
             End If

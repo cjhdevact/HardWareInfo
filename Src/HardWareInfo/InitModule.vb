@@ -1,4 +1,30 @@
-﻿Imports System.Runtime.InteropServices
+﻿'****************************************************************************
+'    HardWareInfo
+'    Copyright (C) 2026 CJH
+'
+'    This program is free software: you can redistribute it and/or modify
+'    it under the terms of the GNU General Public License as published by
+'    the Free Software Foundation, either version 3 of the License, or
+'    (at your option) any later version.
+'
+'    This program is distributed in the hope that it will be useful,
+'    but WITHOUT ANY WARRANTY; without even the implied warranty of
+'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+'    GNU General Public License for more details.
+'
+'    You should have received a copy of the GNU General Public License
+'    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+'****************************************************************************
+'/*****************************************************\
+'*                                                     *
+'*     HardWareInfo - InitModule.vb                    *
+'*                                                     *
+'*     Copyright (c) CJH.                              *
+'*                                                     *
+'*     The program startup module.                     *
+'*                                                     *
+'\*****************************************************/
+Imports System.Runtime.InteropServices
 
 Module InitModule
     Public ConsMode As Integer
@@ -21,9 +47,9 @@ Module InitModule
             End If
             ConsMode = 1
             ConsoleHWnd = GetConsoleWindow()
-            SetWindowText(ConsoleHWnd, "系统硬件信息读取工具 版本 " & My.Application.Info.Version.ToString)
+            SetWindowText(ConsoleHWnd, "系统信息硬件记录读取工具 版本 " & My.Application.Info.Version.ToString)
             Console.OutputEncoding = System.Text.Encoding.UTF8
-            Console.Title = "系统硬件信息读取工具 版本 " & My.Application.Info.Version.ToString
+            Console.Title = "系统信息硬件记录读取工具 版本 " & My.Application.Info.Version.ToString
             InfoReadForm.StartDetection()
             Console.ReadKey()
         Else

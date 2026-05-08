@@ -42,6 +42,7 @@ Partial Class InfoReadForm
         Me.CheckBox6 = New System.Windows.Forms.CheckBox()
         Me.CheckBox7 = New System.Windows.Forms.CheckBox()
         Me.CheckBox9 = New System.Windows.Forms.CheckBox()
+        Me.CheckBox10 = New System.Windows.Forms.CheckBox()
         Me.TableLayoutPanel1.SuspendLayout()
         Me.FlowLayoutPanel1.SuspendLayout()
         Me.FlowLayoutPanel2.SuspendLayout()
@@ -49,7 +50,7 @@ Partial Class InfoReadForm
         '
         'Button1
         '
-        Me.Button1.Location = New System.Drawing.Point(711, 5)
+        Me.Button1.Location = New System.Drawing.Point(632, 5)
         Me.Button1.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.Button1.Name = "Button1"
         Me.Button1.Size = New System.Drawing.Size(162, 42)
@@ -60,6 +61,7 @@ Partial Class InfoReadForm
         'TextBox1
         '
         Me.TextBox1.BackColor = System.Drawing.Color.Black
+        Me.TableLayoutPanel1.SetColumnSpan(Me.TextBox1, 2)
         Me.TextBox1.Cursor = System.Windows.Forms.Cursors.Default
         Me.TextBox1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TextBox1.Font = New System.Drawing.Font("宋体", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -70,28 +72,31 @@ Partial Class InfoReadForm
         Me.TextBox1.Name = "TextBox1"
         Me.TextBox1.ReadOnly = True
         Me.TextBox1.ScrollBars = System.Windows.Forms.ScrollBars.Both
-        Me.TextBox1.Size = New System.Drawing.Size(877, 438)
+        Me.TextBox1.Size = New System.Drawing.Size(798, 443)
         Me.TextBox1.TabIndex = 1
         '
         'TableLayoutPanel1
         '
-        Me.TableLayoutPanel1.ColumnCount = 1
+        Me.TableLayoutPanel1.ColumnCount = 2
+        Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100.0!))
         Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
+        Me.TableLayoutPanel1.Controls.Add(Me.Label1, 0, 2)
         Me.TableLayoutPanel1.Controls.Add(Me.FlowLayoutPanel1, 0, 1)
         Me.TableLayoutPanel1.Controls.Add(Me.TextBox1, 0, 0)
-        Me.TableLayoutPanel1.Controls.Add(Me.FlowLayoutPanel2, 0, 2)
+        Me.TableLayoutPanel1.Controls.Add(Me.FlowLayoutPanel2, 1, 2)
         Me.TableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TableLayoutPanel1.Location = New System.Drawing.Point(0, 0)
         Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
         Me.TableLayoutPanel1.RowCount = 3
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100.0!))
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 60.0!))
-        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40.0!))
-        Me.TableLayoutPanel1.Size = New System.Drawing.Size(877, 538)
+        Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 80.0!))
+        Me.TableLayoutPanel1.Size = New System.Drawing.Size(798, 583)
         Me.TableLayoutPanel1.TabIndex = 2
         '
         'FlowLayoutPanel1
         '
+        Me.TableLayoutPanel1.SetColumnSpan(Me.FlowLayoutPanel1, 2)
         Me.FlowLayoutPanel1.Controls.Add(Me.Button1)
         Me.FlowLayoutPanel1.Controls.Add(Me.Button2)
         Me.FlowLayoutPanel1.Controls.Add(Me.Button3)
@@ -100,15 +105,15 @@ Partial Class InfoReadForm
         Me.FlowLayoutPanel1.Controls.Add(Me.CheckBox8)
         Me.FlowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.FlowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft
-        Me.FlowLayoutPanel1.Location = New System.Drawing.Point(0, 438)
+        Me.FlowLayoutPanel1.Location = New System.Drawing.Point(0, 443)
         Me.FlowLayoutPanel1.Margin = New System.Windows.Forms.Padding(0)
         Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
-        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(877, 60)
+        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(798, 60)
         Me.FlowLayoutPanel1.TabIndex = 0
         '
         'Button2
         '
-        Me.Button2.Location = New System.Drawing.Point(627, 5)
+        Me.Button2.Location = New System.Drawing.Point(548, 5)
         Me.Button2.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.Button2.Name = "Button2"
         Me.Button2.Size = New System.Drawing.Size(76, 42)
@@ -118,7 +123,7 @@ Partial Class InfoReadForm
         '
         'Button3
         '
-        Me.Button3.Location = New System.Drawing.Point(543, 5)
+        Me.Button3.Location = New System.Drawing.Point(464, 5)
         Me.Button3.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.Button3.Name = "Button3"
         Me.Button3.Size = New System.Drawing.Size(76, 42)
@@ -128,7 +133,7 @@ Partial Class InfoReadForm
         '
         'Button5
         '
-        Me.Button5.Location = New System.Drawing.Point(459, 5)
+        Me.Button5.Location = New System.Drawing.Point(380, 5)
         Me.Button5.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.Button5.Name = "Button5"
         Me.Button5.Size = New System.Drawing.Size(76, 42)
@@ -138,7 +143,7 @@ Partial Class InfoReadForm
         '
         'Button4
         '
-        Me.Button4.Location = New System.Drawing.Point(366, 5)
+        Me.Button4.Location = New System.Drawing.Point(287, 5)
         Me.Button4.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
         Me.Button4.Name = "Button4"
         Me.Button4.Size = New System.Drawing.Size(85, 42)
@@ -150,7 +155,7 @@ Partial Class InfoReadForm
         'CheckBox8
         '
         Me.CheckBox8.AutoSize = True
-        Me.CheckBox8.Location = New System.Drawing.Point(241, 16)
+        Me.CheckBox8.Location = New System.Drawing.Point(162, 16)
         Me.CheckBox8.Margin = New System.Windows.Forms.Padding(3, 16, 3, 3)
         Me.CheckBox8.Name = "CheckBox8"
         Me.CheckBox8.Size = New System.Drawing.Size(118, 24)
@@ -160,7 +165,6 @@ Partial Class InfoReadForm
         '
         'FlowLayoutPanel2
         '
-        Me.FlowLayoutPanel2.Controls.Add(Me.Label1)
         Me.FlowLayoutPanel2.Controls.Add(Me.CheckBox1)
         Me.FlowLayoutPanel2.Controls.Add(Me.CheckBox2)
         Me.FlowLayoutPanel2.Controls.Add(Me.CheckBox3)
@@ -169,29 +173,32 @@ Partial Class InfoReadForm
         Me.FlowLayoutPanel2.Controls.Add(Me.CheckBox6)
         Me.FlowLayoutPanel2.Controls.Add(Me.CheckBox7)
         Me.FlowLayoutPanel2.Controls.Add(Me.CheckBox9)
+        Me.FlowLayoutPanel2.Controls.Add(Me.CheckBox10)
         Me.FlowLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.FlowLayoutPanel2.Location = New System.Drawing.Point(0, 498)
+        Me.FlowLayoutPanel2.Location = New System.Drawing.Point(100, 503)
         Me.FlowLayoutPanel2.Margin = New System.Windows.Forms.Padding(0)
         Me.FlowLayoutPanel2.Name = "FlowLayoutPanel2"
-        Me.FlowLayoutPanel2.Size = New System.Drawing.Size(877, 40)
+        Me.FlowLayoutPanel2.Size = New System.Drawing.Size(698, 80)
         Me.FlowLayoutPanel2.TabIndex = 2
         '
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(3, 8)
-        Me.Label1.Margin = New System.Windows.Forms.Padding(3, 8, 3, 0)
+        Me.Label1.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.Label1.Location = New System.Drawing.Point(0, 503)
+        Me.Label1.Margin = New System.Windows.Forms.Padding(0)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(69, 20)
+        Me.Label1.Size = New System.Drawing.Size(100, 80)
         Me.Label1.TabIndex = 0
         Me.Label1.Text = "输出内容"
+        Me.Label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
         '
         'CheckBox1
         '
         Me.CheckBox1.AutoSize = True
         Me.CheckBox1.Checked = True
         Me.CheckBox1.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.CheckBox1.Location = New System.Drawing.Point(78, 8)
+        Me.CheckBox1.Location = New System.Drawing.Point(3, 8)
         Me.CheckBox1.Margin = New System.Windows.Forms.Padding(3, 8, 3, 3)
         Me.CheckBox1.Name = "CheckBox1"
         Me.CheckBox1.Size = New System.Drawing.Size(88, 24)
@@ -204,7 +211,7 @@ Partial Class InfoReadForm
         Me.CheckBox2.AutoSize = True
         Me.CheckBox2.Checked = True
         Me.CheckBox2.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.CheckBox2.Location = New System.Drawing.Point(172, 8)
+        Me.CheckBox2.Location = New System.Drawing.Point(97, 8)
         Me.CheckBox2.Margin = New System.Windows.Forms.Padding(3, 8, 3, 3)
         Me.CheckBox2.Name = "CheckBox2"
         Me.CheckBox2.Size = New System.Drawing.Size(103, 24)
@@ -217,7 +224,7 @@ Partial Class InfoReadForm
         Me.CheckBox3.AutoSize = True
         Me.CheckBox3.Checked = True
         Me.CheckBox3.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.CheckBox3.Location = New System.Drawing.Point(281, 8)
+        Me.CheckBox3.Location = New System.Drawing.Point(206, 8)
         Me.CheckBox3.Margin = New System.Windows.Forms.Padding(3, 8, 3, 3)
         Me.CheckBox3.Name = "CheckBox3"
         Me.CheckBox3.Size = New System.Drawing.Size(88, 24)
@@ -230,7 +237,7 @@ Partial Class InfoReadForm
         Me.CheckBox4.AutoSize = True
         Me.CheckBox4.Checked = True
         Me.CheckBox4.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.CheckBox4.Location = New System.Drawing.Point(375, 8)
+        Me.CheckBox4.Location = New System.Drawing.Point(300, 8)
         Me.CheckBox4.Margin = New System.Windows.Forms.Padding(3, 8, 3, 3)
         Me.CheckBox4.Name = "CheckBox4"
         Me.CheckBox4.Size = New System.Drawing.Size(89, 24)
@@ -243,7 +250,7 @@ Partial Class InfoReadForm
         Me.CheckBox5.AutoSize = True
         Me.CheckBox5.Checked = True
         Me.CheckBox5.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.CheckBox5.Location = New System.Drawing.Point(470, 8)
+        Me.CheckBox5.Location = New System.Drawing.Point(395, 8)
         Me.CheckBox5.Margin = New System.Windows.Forms.Padding(3, 8, 3, 3)
         Me.CheckBox5.Name = "CheckBox5"
         Me.CheckBox5.Size = New System.Drawing.Size(118, 24)
@@ -256,7 +263,7 @@ Partial Class InfoReadForm
         Me.CheckBox6.AutoSize = True
         Me.CheckBox6.Checked = True
         Me.CheckBox6.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.CheckBox6.Location = New System.Drawing.Point(594, 8)
+        Me.CheckBox6.Location = New System.Drawing.Point(519, 8)
         Me.CheckBox6.Margin = New System.Windows.Forms.Padding(3, 8, 3, 3)
         Me.CheckBox6.Name = "CheckBox6"
         Me.CheckBox6.Size = New System.Drawing.Size(92, 24)
@@ -269,7 +276,7 @@ Partial Class InfoReadForm
         Me.CheckBox7.AutoSize = True
         Me.CheckBox7.Checked = True
         Me.CheckBox7.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.CheckBox7.Location = New System.Drawing.Point(692, 8)
+        Me.CheckBox7.Location = New System.Drawing.Point(3, 43)
         Me.CheckBox7.Margin = New System.Windows.Forms.Padding(3, 8, 3, 3)
         Me.CheckBox7.Name = "CheckBox7"
         Me.CheckBox7.Size = New System.Drawing.Size(88, 24)
@@ -282,7 +289,7 @@ Partial Class InfoReadForm
         Me.CheckBox9.AutoSize = True
         Me.CheckBox9.Checked = True
         Me.CheckBox9.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.CheckBox9.Location = New System.Drawing.Point(786, 8)
+        Me.CheckBox9.Location = New System.Drawing.Point(97, 43)
         Me.CheckBox9.Margin = New System.Windows.Forms.Padding(3, 8, 3, 3)
         Me.CheckBox9.Name = "CheckBox9"
         Me.CheckBox9.Size = New System.Drawing.Size(88, 24)
@@ -290,18 +297,31 @@ Partial Class InfoReadForm
         Me.CheckBox9.Text = "音频记录"
         Me.CheckBox9.UseVisualStyleBackColor = True
         '
+        'CheckBox10
+        '
+        Me.CheckBox10.AutoSize = True
+        Me.CheckBox10.Checked = True
+        Me.CheckBox10.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.CheckBox10.Location = New System.Drawing.Point(191, 43)
+        Me.CheckBox10.Margin = New System.Windows.Forms.Padding(3, 8, 3, 3)
+        Me.CheckBox10.Name = "CheckBox10"
+        Me.CheckBox10.Size = New System.Drawing.Size(103, 24)
+        Me.CheckBox10.TabIndex = 14
+        Me.CheckBox10.Text = "摄像头记录"
+        Me.CheckBox10.UseVisualStyleBackColor = True
+        '
         'InfoReadForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
         Me.BackColor = System.Drawing.Color.White
-        Me.ClientSize = New System.Drawing.Size(877, 538)
+        Me.ClientSize = New System.Drawing.Size(798, 583)
         Me.Controls.Add(Me.TableLayoutPanel1)
         Me.Font = New System.Drawing.Font("微软雅黑", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(134, Byte))
         Me.ForeColor = System.Drawing.Color.Black
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Margin = New System.Windows.Forms.Padding(4, 5, 4, 5)
-        Me.MinimumSize = New System.Drawing.Size(893, 577)
+        Me.MinimumSize = New System.Drawing.Size(814, 622)
         Me.Name = "InfoReadForm"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "系统信息硬件记录读取工具"
@@ -333,4 +353,5 @@ Partial Class InfoReadForm
     Friend WithEvents CheckBox7 As System.Windows.Forms.CheckBox
     Friend WithEvents CheckBox8 As System.Windows.Forms.CheckBox
     Friend WithEvents CheckBox9 As System.Windows.Forms.CheckBox
+    Friend WithEvents CheckBox10 As System.Windows.Forms.CheckBox
 End Class

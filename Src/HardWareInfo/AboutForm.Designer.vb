@@ -28,7 +28,7 @@ Partial Class AboutForm
         Me.Label2 = New System.Windows.Forms.Label()
         Me.Button1 = New System.Windows.Forms.Button()
         Me.Label3 = New System.Windows.Forms.Label()
-        Me.Label4 = New System.Windows.Forms.Label()
+        Me.LinkLabel1 = New System.Windows.Forms.LinkLabel()
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -55,15 +55,16 @@ Partial Class AboutForm
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(18, 95)
+        Me.Label2.Location = New System.Drawing.Point(14, 84)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(297, 21)
+        Me.Label2.Size = New System.Drawing.Size(452, 63)
         Me.Label2.TabIndex = 2
-        Me.Label2.Text = "版权所有 © 2026 CJH。保留所有权利。"
+        Me.Label2.Text = "版权所有 © 2026 CJH。保留所有权利。" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "基于 GNU GENERAL PUBLIC LICENSE Version 3 协议发布。" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "使用 /c 参数启" & _
+            "动使用命令行模式输出。"
         '
         'Button1
         '
-        Me.Button1.Location = New System.Drawing.Point(341, 163)
+        Me.Button1.Location = New System.Drawing.Point(341, 203)
         Me.Button1.Name = "Button1"
         Me.Button1.Size = New System.Drawing.Size(120, 45)
         Me.Button1.TabIndex = 3
@@ -73,28 +74,30 @@ Partial Class AboutForm
         'Label3
         '
         Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(18, 64)
+        Me.Label3.Location = New System.Drawing.Point(14, 54)
         Me.Label3.Name = "Label3"
         Me.Label3.Size = New System.Drawing.Size(42, 21)
         Me.Label3.TabIndex = 4
         Me.Label3.Text = "版本"
         '
-        'Label4
+        'LinkLabel1
         '
-        Me.Label4.AutoSize = True
-        Me.Label4.Location = New System.Drawing.Point(18, 126)
-        Me.Label4.Name = "Label4"
-        Me.Label4.Size = New System.Drawing.Size(291, 21)
-        Me.Label4.TabIndex = 5
-        Me.Label4.Text = "使用 /c 参数启动使用命令行模式输出。"
+        Me.LinkLabel1.AutoSize = True
+        Me.LinkLabel1.LinkColor = System.Drawing.Color.DodgerBlue
+        Me.LinkLabel1.Location = New System.Drawing.Point(14, 161)
+        Me.LinkLabel1.Name = "LinkLabel1"
+        Me.LinkLabel1.Size = New System.Drawing.Size(74, 21)
+        Me.LinkLabel1.TabIndex = 6
+        Me.LinkLabel1.TabStop = True
+        Me.LinkLabel1.Text = "项目主页"
         '
         'AboutForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
         Me.BackColor = System.Drawing.Color.White
-        Me.ClientSize = New System.Drawing.Size(473, 224)
-        Me.Controls.Add(Me.Label4)
+        Me.ClientSize = New System.Drawing.Size(473, 260)
+        Me.Controls.Add(Me.LinkLabel1)
         Me.Controls.Add(Me.Label3)
         Me.Controls.Add(Me.Button1)
         Me.Controls.Add(Me.Label2)
@@ -121,5 +124,5 @@ Partial Class AboutForm
     Friend WithEvents Label2 As System.Windows.Forms.Label
     Friend WithEvents Button1 As System.Windows.Forms.Button
     Friend WithEvents Label3 As System.Windows.Forms.Label
-    Friend WithEvents Label4 As System.Windows.Forms.Label
+    Friend WithEvents LinkLabel1 As System.Windows.Forms.LinkLabel
 End Class

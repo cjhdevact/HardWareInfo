@@ -1,8 +1,33 @@
-﻿Imports Microsoft.Win32
-Imports System.Collections.Generic
+﻿'****************************************************************************
+'    HardWareInfo
+'    Copyright (C) 2026 CJH
+'
+'    This program is free software: you can redistribute it and/or modify
+'    it under the terms of the GNU General Public License as published by
+'    the Free Software Foundation, either version 3 of the License, or
+'    (at your option) any later version.
+'
+'    This program is distributed in the hope that it will be useful,
+'    but WITHOUT ANY WARRANTY; without even the implied warranty of
+'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+'    GNU General Public License for more details.
+'
+'    You should have received a copy of the GNU General Public License
+'    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+'****************************************************************************
+'/*****************************************************\
+'*                                                     *
+'*     HardWareInfo - InfoReadForm.vb                  *
+'*                                                     *
+'*     Copyright (c) CJH.                              *
+'*                                                     *
+'*     The information reader form.                    *
+'*                                                     *
+'\*****************************************************/
+Imports Microsoft.Win32
+
 
 Public Class InfoReadForm
-
     ' 中断标志和线程
     Private cancelDetection As Boolean = False
     Private CheckProgress As System.Threading.Thread = Nothing
@@ -110,6 +135,11 @@ Public Class InfoReadForm
                 If Not cancelDetection Then ShowAudioDeviceInfo()
             End If
 
+            ' 摄像头设备
+            If CheckBox10.Checked = True Then
+                If Not cancelDetection Then ShowCameraInfo()
+            End If
+
             If Not cancelDetection Then
                 AppendToTextBox("")
                 AppendToTextBox("[INFO] 硬件信息读取完成")
@@ -143,7 +173,7 @@ Public Class InfoReadForm
         Button4.Visible = False
     End Sub
 
-    ' 按钮4点击事件 - 中断检测
+    ' 中断检测
     Private Sub Button4_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button4.Click
         cancelDetection = True
 
@@ -175,8 +205,8 @@ Public Class InfoReadForm
                 AppendToTextBox("  Build 号    : " & GetRegValue(reg, "CurrentBuild", "未知"))
                 AppendToTextBox("  UBR         : " & GetRegValue(reg, "UBR", "未知"))
                 AppendToTextBox("  Build 分支  : " & GetRegValue(reg, "BuildBranch", "未知"))
-                AppendToTextBox("  注册所有者  : " & GetRegValue(reg, "RegisteredOwner", "未知"))
-                AppendToTextBox("  注册组织    : " & GetRegValue(reg, "RegisteredOrganization", "未知"))
+                AppendToTextBox("  注册所有者  : " & GetRegValue(reg, "RegisteredOwner", ""))
+                AppendToTextBox("  注册组织    : " & GetRegValue(reg, "RegisteredOrganization", ""))
                 AppendToTextBox("  安装类型    : " & GetRegValue(reg, "InstallationType", "未知"))
                 AppendToTextBox("  版本ID      : " & GetRegValue(reg, "EditionID", "未知"))
                 reg.Close()
@@ -210,8 +240,20 @@ Public Class InfoReadForm
                         Dim subKey As RegistryKey = uKey.OpenSubKey(Name2)
                         Dim dispName As String = GetRegValue(subKey, "DisplayName", "")
                         Dim dispVer As String = GetRegValue(subKey, "DisplayVersion", "")
+                        Dim installDate As String = GetRegValue(subKey, "InstallDate", "")
+
+                        ' 统一空值显示
+                        If String.IsNullOrWhiteSpace(dispVer) Then dispVer = "未知版本"
+                        If String.IsNullOrWhiteSpace(installDate) Then
+                            installDate = "未知安装日期"
+                        Else
+                            If installDate.Length = 8 Then
+                                installDate = installDate.Substring(0, 4) & "-" & installDate.Substring(4, 2) & "-" & installDate.Substring(6, 2)
+                            End If
+                        End If
+
                         If dispName <> "" Then
-                            AppendToTextBox("  " & dispName & " | " & dispVer)
+                            AppendToTextBox("  " & dispName & " | " & dispVer & " | " & installDate)
                             count += 1
                         End If
                         subKey.Close()
@@ -233,8 +275,20 @@ Public Class InfoReadForm
                         Dim subKey As RegistryKey = uKey.OpenSubKey(Name1)
                         Dim dispName As String = GetRegValue(subKey, "DisplayName", "")
                         Dim dispVer As String = GetRegValue(subKey, "DisplayVersion", "")
+                        Dim installDate As String = GetRegValue(subKey, "InstallDate", "")
+
+                        ' 统一空值显示
+                        If String.IsNullOrWhiteSpace(dispVer) Then dispVer = "未知版本"
+                        If String.IsNullOrWhiteSpace(installDate) Then
+                            installDate = "未知安装日期"
+                        Else
+                            If installDate.Length = 8 Then
+                                installDate = installDate.Substring(0, 4) & "-" & installDate.Substring(4, 2) & "-" & installDate.Substring(6, 2)
+                            End If
+                        End If
+
                         If dispName <> "" Then
-                            AppendToTextBox("  " & dispName & " | " & dispVer)
+                            AppendToTextBox("  " & dispName & " | " & dispVer & " | " & installDate)
                             count += 1
                         End If
                         subKey.Close()
@@ -264,7 +318,6 @@ Public Class InfoReadForm
             Dim cpuDetailList As New List(Of String)()
             Dim CPU_CLASS_GUID As String = "{50127dc3-0f36-415e-a6cc-4cb3be910b65}"
 
-            ' 只扫描 ACPI 路径（按你的要求）
             Dim acpiKey As RegistryKey = RegistryRoot.OpenSubKey("SYSTEM\CurrentControlSet\Enum\ACPI")
             If acpiKey IsNot Nothing Then
                 For Each keyName As String In acpiKey.GetSubKeyNames()
@@ -281,11 +334,9 @@ Public Class InfoReadForm
 
                             Dim cpuKey As RegistryKey = Nothing
                             Try
-                                ' 安全打开，无子键自动跳过
                                 cpuKey = vendorKey.OpenSubKey(instName)
                                 If cpuKey Is Nothing Then Continue For
 
-                                ' 唯一判断：ClassGUID 匹配就是CPU（无任何硬编码）
                                 Dim classGuid As String = GetRegValue(cpuKey, "ClassGUID", "").Trim()
                                 If classGuid.Equals(CPU_CLASS_GUID, StringComparison.OrdinalIgnoreCase) Then
 
@@ -298,15 +349,13 @@ Public Class InfoReadForm
                                         cpuList.Add(cpuName)
 
 
-                                        ' 输出格式保持和你原来完全一致
-                                        Dim info As String = "  " & cpuName & Environment.NewLine
+                                        Dim info As String = "  " & cpuName '& Environment.NewLine
 
                                         cpuDetailList.Add(info)
                                     End If
                                 End If
 
                             Catch
-                                ' 异常直接跳过，不崩溃
                                 Continue For
                             Finally
                                 If cpuKey IsNot Nothing Then cpuKey.Close()
@@ -327,26 +376,29 @@ Public Class InfoReadForm
                     AppendToTextBox(info)
                 Next
             Else
-                ' 备用方案（兜底）
-                Dim cpu0Key As RegistryKey = RegistryRoot.OpenSubKey("HARDWARE\DESCRIPTION\System\CentralProcessor\0")
-                If cpu0Key IsNot Nothing Then
-                    Dim procName As String = GetRegValue(cpu0Key, "ProcessorNameString", "未知CPU")
-                    Dim vendor As String = GetRegValue(cpu0Key, "VendorIdentifier", "未知")
-                    Dim mhz As String = GetRegValue(cpu0Key, "~MHz", "未知")
+                AppendToTextBox("  未检测到设备")
+            End If
 
-                    Dim coreCount As Integer = 0
-                    Dim coreKey As RegistryKey = RegistryRoot.OpenSubKey("HARDWARE\DESCRIPTION\System\CentralProcessor")
-                    If coreKey IsNot Nothing Then
-                        coreCount = coreKey.GetSubKeyNames().Length
-                        coreKey.Close()
-                    End If
+            ' 当前CPU
+            Dim cpu0Key As RegistryKey = RegistryRoot.OpenSubKey("HARDWARE\DESCRIPTION\System\CentralProcessor\0")
+            If cpu0Key IsNot Nothing Then
+                Dim procName As String = GetRegValue(cpu0Key, "ProcessorNameString", "未知CPU")
+                Dim vendor As String = GetRegValue(cpu0Key, "VendorIdentifier", "未知")
+                Dim mhz As String = GetRegValue(cpu0Key, "~MHz", "未知")
 
-                    AppendToTextBox("  [当前CPU信息] " & procName)
-                    AppendToTextBox("    最大频率   : " & mhz & " MHz")
-                    AppendToTextBox("    厂商       : " & vendor)
-                    AppendToTextBox("    逻辑核心数 : " & coreCount)
-                    cpu0Key.Close()
+                Dim coreCount As Integer = 0
+                Dim coreKey As RegistryKey = RegistryRoot.OpenSubKey("HARDWARE\DESCRIPTION\System\CentralProcessor")
+                If coreKey IsNot Nothing Then
+                    coreCount = coreKey.GetSubKeyNames().Length
+                    coreKey.Close()
                 End If
+
+                AppendToTextBox("")
+                AppendToTextBox("  [当前CPU信息] " & procName)
+                AppendToTextBox("    最大频率   : " & mhz & " MHz")
+                AppendToTextBox("    厂商       : " & vendor)
+                AppendToTextBox("    逻辑核心数 : " & coreCount)
+                cpu0Key.Close()
             End If
 
         Catch ex As Exception
@@ -361,6 +413,7 @@ Public Class InfoReadForm
 
         AppendToTextBox("")
         AppendToTextBox("[ 显卡 GPU 信息 ]")
+        Dim hasGpu As Boolean = False
         Try
             Dim displayKey As RegistryKey = RegistryRoot.OpenSubKey("SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}")
             If displayKey IsNot Nothing Then
@@ -390,6 +443,7 @@ Public Class InfoReadForm
                         If drvVer <> "" Then AppendToTextBox("    驱动版本   : " & drvVer)
                         Dim drvDate As String = GetRegValue(gpuKey, "DriverDate", "")
                         If drvDate <> "" Then AppendToTextBox("    驱动日期   : " & drvDate)
+                        hasGpu = True
                     End If
                     gpuKey.Close()
                 Next
@@ -416,15 +470,20 @@ Public Class InfoReadForm
 
                         If className = "Display" OrElse classGuid = "{4d36e968-e325-11ce-bfc1-08002be10318}" Then
                             Dim desc As String = GetRegValue(devKey, "DeviceDesc", "")
-                            If desc <> "" AndAlso Not desc.Contains("@oem") Then
-                                AppendToTextBox("  [PCI] " & desc)
-                            End If
+                            'If desc <> "" AndAlso Not desc.Contains("@oem") Then
+                            AppendToTextBox("  [PCI] " & desc)
+                            hasGpu = True
+                            'End If
                         End If
                         devKey.Close()
                     Next
                     venKey.Close()
                 Next
                 pciKey.Close()
+            End If
+
+            If Not hasGpu Then
+                AppendToTextBox("  未检测到设备")
             End If
         Catch ex As Exception
             AppendToTextBox("  读取失败：" & ex.Message)
@@ -438,6 +497,7 @@ Public Class InfoReadForm
 
         AppendToTextBox("")
         AppendToTextBox("[ 硬盘信息 ]")
+
         Try
             Dim diskPaths As New List(Of String) From {
                 "SYSTEM\CurrentControlSet\Enum\SCSI",
@@ -487,7 +547,7 @@ Public Class InfoReadForm
                 End If
             Next
 
-            If Not found Then AppendToTextBox("  未找到硬盘信息")
+            If Not found Then AppendToTextBox("  未检测到设备")
         Catch ex As Exception
             AppendToTextBox("  读取失败：" & ex.Message)
         End Try
@@ -497,28 +557,57 @@ Public Class InfoReadForm
 #Region "主板 / BIOS 信息"
     Sub ShowMotherboardBiosInfo()
         If cancelDetection Then Exit Sub
-
+        Dim hasInfo As Boolean = False
         AppendToTextBox("")
         AppendToTextBox("[ 主板 / BIOS 信息 ]")
         Try
             Dim hwConfigPath As String = "SYSTEM\HardwareConfig"
             Dim hwConfigKey As RegistryKey = RegistryRoot.OpenSubKey(hwConfigPath)
             If hwConfigKey Is Nothing Then
-                AppendToTextBox("  未读取到硬件配置信息")
+                AppendToTextBox("  未检测到设备")
                 Exit Sub
             End If
 
-            ' 读取 LastConfig 获得最近一次使用的 GUID
+            ' 读取最近使用的 GUID
             Dim lastConfigGuid As String = GetRegValue(hwConfigKey, "LastConfig", "").Trim()
-
             Dim biosIds As String() = hwConfigKey.GetSubKeyNames()
             Dim index As Integer = 1
 
+            ' 优先输出最近使用的项
+            If Not String.IsNullOrEmpty(lastConfigGuid) Then
+                Dim lastPath As String = hwConfigPath & "\" & lastConfigGuid
+                Dim lastKey As RegistryKey = RegistryRoot.OpenSubKey(lastPath)
+
+                If lastKey IsNot Nothing Then
+                    AppendToTextBox("  [1] " & lastConfigGuid & " <- 最近使用")
+
+                    AppendToTextBox("      整机厂商      : " & GetRegValue(lastKey, "SystemManufacturer", "未知"))
+                    AppendToTextBox("      整机型号      : " & GetRegValue(lastKey, "SystemProductName", "未知"))
+                    AppendToTextBox("      整机SKU       : " & GetRegValue(lastKey, "SystemSKU", "未知"))
+                    AppendToTextBox("      主板厂商      : " & GetRegValue(lastKey, "BaseBoardManufacturer", "未知"))
+                    AppendToTextBox("      主板型号      : " & GetRegValue(lastKey, "BaseBoardProduct", "未知"))
+                    AppendToTextBox("      BIOS 厂商     : " & GetRegValue(lastKey, "BIOSVendor", "未知"))
+                    AppendToTextBox("      BIOS 版本     : " & GetRegValue(lastKey, "BIOSVersion", "未知"))
+                    AppendToTextBox("      BIOS 日期     : " & GetRegValue(lastKey, "BIOSReleaseDate", "未知"))
+                    AppendToTextBox("")
+
+                    lastKey.Close()
+                    index = 2 ' 下一条从 2 开始编号
+                    hasInfo = True
+                End If
+            End If
+
+            ' 输出其他所有项（跳过 Current 和已顶置的 LastConfig）
             For Each biosId As String In biosIds
                 If cancelDetection Then Exit Sub
 
-                ' 只跳过 Current，其他全部保留
+                ' 只跳过 Current
                 If String.Equals(biosId, "Current", StringComparison.OrdinalIgnoreCase) Then
+                    Continue For
+                End If
+
+                ' 跳过已经顶置的最近配置
+                If biosId.Equals(lastConfigGuid, StringComparison.OrdinalIgnoreCase) Then
                     Continue For
                 End If
 
@@ -526,14 +615,8 @@ Public Class InfoReadForm
                 Dim biosKey As RegistryKey = RegistryRoot.OpenSubKey(subPath)
                 If biosKey Is Nothing Then Continue For
 
-                ' 只有匹配 LastConfig 的才标记最近使用
-                Dim isLastUsed As Boolean = biosId.Equals(lastConfigGuid, StringComparison.OrdinalIgnoreCase)
-
                 ' 输出
                 Dim header As String = "  [" & index.ToString() & "] " & biosId
-                If isLastUsed Then
-                    header &= " <- 最近使用"
-                End If
                 AppendToTextBox(header)
 
                 Dim systemManufacturer As String = GetRegValue(biosKey, "SystemManufacturer", "未知")
@@ -556,9 +639,15 @@ Public Class InfoReadForm
                 AppendToTextBox("")
 
                 biosKey.Close()
-                index = index + 1
+                index += 1
+                hasInfo = True
             Next
+
             hwConfigKey.Close()
+
+            If Not hasInfo Then
+                AppendToTextBox("  未检测到设备")
+            End If
         Catch ex As Exception
             AppendToTextBox("  读取失败：" & ex.Message)
         End Try
@@ -571,6 +660,7 @@ Public Class InfoReadForm
 
         AppendToTextBox("")
         AppendToTextBox("[ 网络适配器信息 ]")
+        Dim hasNet As Boolean = False
         Try
             ' 通过网络适配器类 GUID 读取
             Dim netClassGuid As String = "{4d36e972-e325-11ce-bfc1-08002be10318}"
@@ -617,6 +707,7 @@ Public Class InfoReadForm
                             End If
                         End If
                         AppendToTextBox("")
+                        hasNet = True
                     End If
                     adapterKey.Close()
 
@@ -644,6 +735,7 @@ Public Class InfoReadForm
                             Dim desc As String = GetRegValue(devKey, "DeviceDesc", "")
                             If desc <> "" AndAlso Not desc.Contains("NDIS") Then
                                 AppendToTextBox("  [PCI] " & desc)
+                                hasNet = True
                             End If
                         End If
                         devKey.Close()
@@ -651,6 +743,9 @@ Public Class InfoReadForm
                     venKey.Close()
                 Next
                 pnpKey.Close()
+            End If
+            If Not hasNet Then
+                AppendToTextBox("  未检测到设备")
             End If
         Catch ex As Exception
             AppendToTextBox("  读取失败：" & ex.Message)
@@ -664,6 +759,7 @@ Public Class InfoReadForm
 
         AppendToTextBox("")
         AppendToTextBox("[ 音频设备信息 ]")
+        Dim hasAudio As Boolean = False
         Try
             ' 先从音频类路径读取所有设备的完整驱动信息
             Dim audioClassGuid As String = "{4d36e96c-e325-11ce-bfc1-08002be10318}"
@@ -686,10 +782,10 @@ Public Class InfoReadForm
                         deviceKey.Close()
                         Continue For
                     End If
-                    If String.IsNullOrWhiteSpace(deviceDesc) OrElse deviceDesc.Contains("@oem") Then
-                        deviceKey.Close()
-                        Continue For
-                    End If
+                    'If String.IsNullOrWhiteSpace(deviceDesc) OrElse deviceDesc.Contains("@oem") Then
+                    '    deviceKey.Close()
+                    '    Continue For
+                    'End If
 
                     AppendToTextBox("  " & deviceDesc)
                     AppendToTextBox("    驱动厂商   : " & provider)
@@ -697,6 +793,7 @@ Public Class InfoReadForm
                     If Not String.IsNullOrWhiteSpace(drvVer) Then AppendToTextBox("    驱动版本   : " & drvVer)
                     If Not String.IsNullOrWhiteSpace(drvDate) Then AppendToTextBox("    驱动日期   : " & drvDate)
                     AppendToTextBox("")
+                    hasAudio = True
                     deviceKey.Close()
                 Next
                 audioClassKey.Close()
@@ -725,13 +822,14 @@ Public Class InfoReadForm
 
                         ' 只处理音频设备
                         If (classGuid = "{4d36e96c-e325-11ce-bfc1-08002be10318}" OrElse
-                            devDesc.Contains("Audio") OrElse devDesc.Contains("Sound")) AndAlso
-                            Not friendlyName.Contains("@oem") Then
+                            devDesc.Contains("Audio") OrElse devDesc.Contains("Sound")) Then 'AndAlso
+                            ' Not friendlyName.Contains("@oem") Then
 
                             Dim displayName As String = If(Not String.IsNullOrWhiteSpace(friendlyName), friendlyName, devDesc)
                             AppendToTextBox("  [USB音频] " & displayName)
                             AppendToTextBox("    硬件ID     : " & instanceId)
                             AppendToTextBox("")
+                            hasAudio = True
                         End If
                         devKey.Close()
                     Next
@@ -755,12 +853,13 @@ Public Class InfoReadForm
                                 Dim friendlyName As String = GetRegValue(devKey, "FriendlyName", "")
                                 Dim instanceId As String = GetRegValue(devKey, "HardwareID", "")
 
-                                If Not devDesc.Contains("@oem") AndAlso Not String.IsNullOrWhiteSpace(instanceId) Then
-                                    Dim displayName As String = If(Not String.IsNullOrWhiteSpace(friendlyName), friendlyName, devDesc)
-                                    AppendToTextBox("  [HDAUDIO] " & displayName)
-                                    AppendToTextBox("    硬件ID     : " & instanceId)
-                                    AppendToTextBox("")
-                                End If
+                                'If Not devDesc.Contains("@oem") AndAlso Not String.IsNullOrWhiteSpace(instanceId) Then
+                                Dim displayName As String = If(Not String.IsNullOrWhiteSpace(friendlyName), friendlyName, devDesc)
+                                AppendToTextBox("  [HDAUDIO] " & displayName)
+                                AppendToTextBox("    硬件ID     : " & instanceId)
+                                AppendToTextBox("")
+                                hasAudio = True
+                                ' End If
                                 devKey.Close()
                             End If
                         Next
@@ -786,11 +885,12 @@ Public Class InfoReadForm
                             If className = "Media" Or className = "Audio" Then
                                 Dim desc As String = GetRegValue(devKey, "DeviceDesc", "")
                                 Dim hwid As String = GetRegValue(devKey, "HardwareID", "")
-                                If desc <> "" AndAlso Not desc.Contains("@oem") Then
-                                    AppendToTextBox("  [PCI音频设备] " & desc)
-                                    AppendToTextBox("    硬件ID     : " & hwid)
-                                    AppendToTextBox("")
-                                End If
+                                ' If desc <> "" AndAlso Not desc.Contains("@oem") Then
+                                AppendToTextBox("  [PCI音频设备] " & desc)
+                                AppendToTextBox("    硬件ID     : " & hwid)
+                                AppendToTextBox("")
+                                hasAudio = True
+                                'End If
                             End If
                             devKey.Close()
                         End If
@@ -798,6 +898,82 @@ Public Class InfoReadForm
                     venKey.Close()
                 Next
                 pciKey.Close()
+            End If
+
+            If Not hasAudio Then
+                AppendToTextBox("  未检测到设备")
+            End If
+
+        Catch ex As Exception
+            AppendToTextBox("  读取失败：" & ex.Message)
+        End Try
+    End Sub
+#End Region
+
+#Region "摄像头设备信息"
+    Sub ShowCameraInfo()
+        If cancelDetection Then Exit Sub
+
+        AppendToTextBox("")
+        AppendToTextBox("[ 摄像头设备信息 ]")
+        Try
+            Dim CAMERA_CLASS_GUIDS As New List(Of String) From {
+                "{ca3e7ab9-b4c3-4ae6-8251-579ef933890f}",
+                "{6bdd1fc6-810f-11d0-bec7-08002be2092f}"
+            }
+
+            Dim foundCam As Boolean = False
+            ' 用硬件ID作为唯一键，只要硬件ID相同，就只输出一次
+            Dim seenHardwareIds As New HashSet(Of String)()
+
+            ' 扫描 USB 设备
+            Dim scanPath As String = "SYSTEM\CurrentControlSet\Enum\USB"
+            Dim rootKey As RegistryKey = RegistryRoot.OpenSubKey(scanPath)
+            If rootKey Is Nothing Then
+                AppendToTextBox("  未检测到摄像头设备")
+                Exit Sub
+            End If
+
+            For Each venName In rootKey.GetSubKeyNames()
+                If cancelDetection Then Exit Sub
+                Dim venKey As RegistryKey = rootKey.OpenSubKey(venName)
+                If venKey Is Nothing Then Continue For
+
+                For Each devName In venKey.GetSubKeyNames()
+                    If cancelDetection Then Exit Sub
+                    Dim devKey As RegistryKey = venKey.OpenSubKey(devName)
+                    If devKey Is Nothing Then Continue For
+
+                    Dim classGuid As String = GetRegValue(devKey, "ClassGUID", "").Trim()
+                    Dim friendlyName As String = GetRegValue(devKey, "FriendlyName", "").Trim()
+                    Dim devDesc As String = GetRegValue(devKey, "DeviceDesc", "").Trim()
+                    Dim hwId As String = GetRegValue(devKey, "HardwareID", "").Trim()
+
+                    Dim isCamera As Boolean = CAMERA_CLASS_GUIDS.Any(Function(g) classGuid.Equals(g, StringComparison.OrdinalIgnoreCase))
+
+                    If isCamera AndAlso Not String.IsNullOrWhiteSpace(hwId) Then
+                        ' 以硬件ID字符串为唯一标准去重
+                        If Not seenHardwareIds.Contains(hwId) Then
+                            seenHardwareIds.Add(hwId)
+
+                            Dim displayName As String = If(Not String.IsNullOrWhiteSpace(friendlyName), friendlyName, devDesc)
+                            If String.IsNullOrWhiteSpace(displayName) Then displayName = "未知摄像头"
+
+                            AppendToTextBox("  " & displayName)
+                            AppendToTextBox("    硬件ID     : " & hwId)
+                            AppendToTextBox("")
+                            foundCam = True
+                        End If
+                    End If
+
+                    devKey.Close()
+                Next
+                venKey.Close()
+            Next
+            rootKey.Close()
+
+            If Not foundCam Then
+                AppendToTextBox("  未检测到设备")
             End If
 
         Catch ex As Exception
@@ -844,6 +1020,7 @@ Public Class InfoReadForm
         End Try
     End Function
 #End Region
+
 
     Private Sub Button2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button2.Click
         Using sfd As New SaveFileDialog()
